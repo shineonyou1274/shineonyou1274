@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Home, Skull, Zap } from 'lucide-react';
-import { getPokemonImage } from '../constants';
+import { getPokemonImage, BATTLE_MESSAGES } from '../constants';
 import { Scenario, GameOption } from '../types';
 
 interface BattleScreenProps {
@@ -25,6 +25,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   const [selectedOption, setSelectedOption] = useState<GameOption | null>(null);
   const [displayOptions, setDisplayOptions] = useState<GameOption[]>([]);
   const [gameState, setGameState] = useState<'battle' | 'feedback'>('battle');
+  const [dynamicFeedback, setDynamicFeedback] = useState<string>('');
 
   // Randomize options on mount or when scenario changes
   useEffect(() => {
@@ -36,11 +37,22 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
     setDisplayOptions(opts);
     setSelectedOption(null);
     setGameState('battle');
+    setDynamicFeedback('');
   }, [scenario]);
 
   const handleOptionClick = (option: GameOption) => {
     if (gameState === 'feedback') return;
     
+    // Select random feedback message
+    const messages = BATTLE_MESSAGES[option.type];
+    const randomIndex = Math.floor(Math.random() * messages.length);
+    let message = messages[randomIndex];
+
+    // Clean up move name (remove explanation in parentheses if exists)
+    const moveNameClean = option.moveName.split(' (')[0];
+    message = message.replace('{move}', moveNameClean);
+
+    setDynamicFeedback(message);
     setSelectedOption(option);
     setGameState('feedback');
     onOptionSelect(option.score);
@@ -161,14 +173,20 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
       {gameState === 'feedback' && selectedOption && (
          <div className="absolute inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm pb-4 sm:pb-10 px-2">
             <div className={`rounded-xl shadow-2xl p-6 w-full max-w-2xl border-4 animate-fade-in-up ${selectedOption.type === 'good' ? 'bg-slate-800 border-blue-400' : 'bg-slate-800 border-red-400'}`}>
-               <div className="flex items-center mb-4 border-b border-white/20 pb-2">
+               <div className="flex items-center mb-3 border-b border-white/20 pb-2">
                   <span className={`text-sm font-bold px-2 py-1 rounded mr-2 text-white ${selectedOption.type === 'good' ? 'bg-blue-600' : 'bg-red-600'}`}>
-                     {selectedOption.type === 'good' ? '효과가 굉장했다!' : '효과가 별로인 듯하다...'}
+                     {selectedOption.type === 'good' ? '나이스 샷!' : '실수했다!'}
                   </span>
                   <span className="font-bold text-yellow-400">{selectedOption.feedbackCharacter}의 해설</span>
                </div>
                
-               <div className="text-xl text-white font-medium leading-relaxed mb-6">
+               {/* Dynamic Battle Log Message */}
+               <div className="bg-black/20 rounded-lg p-3 mb-4 text-yellow-300 font-bold text-lg border border-yellow-300/30 animate-pulse leading-snug">
+                  {dynamicFeedback}
+               </div>
+               
+               {/* Story Feedback */}
+               <div className="text-lg text-white font-medium leading-relaxed mb-6">
                   {selectedOption.feedback}
                </div>
 

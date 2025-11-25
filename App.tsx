@@ -18,6 +18,7 @@ export default function App() {
       const saved = localStorage.getItem('pokeLingoHighScore');
       return saved ? parseInt(saved, 10) : 0;
     } catch (e) {
+      // Storage access might be denied
       return 0;
     }
   });
@@ -67,7 +68,11 @@ export default function App() {
       // Game Over: Check and update high score
       if (score > highScore) {
         setHighScore(score);
-        localStorage.setItem('pokeLingoHighScore', score.toString());
+        try {
+          localStorage.setItem('pokeLingoHighScore', score.toString());
+        } catch (e) {
+          console.warn('Could not save high score to local storage:', e);
+        }
       }
       setGameState('result');
     }

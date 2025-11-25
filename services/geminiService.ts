@@ -1,15 +1,9 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Scenario } from '../types';
 
-const apiKey = process.env.API_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateAiScenario = async (topic: string): Promise<Scenario | null> => {
-  if (!apiKey) {
-    console.warn("No API Key provided");
-    return null;
-  }
-
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
