@@ -10,7 +10,6 @@ interface BattleScreenProps {
   onOptionSelect: (score: number) => void;
   onNext: () => void;
   onHome: () => void;
-  isAiMode?: boolean;
 }
 
 export const BattleScreen: React.FC<BattleScreenProps> = ({ 
@@ -20,7 +19,6 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
   onOptionSelect, 
   onNext, 
   onHome,
-  isAiMode = false
 }) => {
   const [selectedOption, setSelectedOption] = useState<GameOption | null>(null);
   const [displayOptions, setDisplayOptions] = useState<GameOption[]>([]);
@@ -72,7 +70,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
          
          <div className="flex justify-end items-center mb-2 h-6">
             <span className="bg-yellow-400 text-black text-xs font-bold px-2 py-0.5 rounded">
-                {isAiMode ? "SPECIAL EVENT" : `BATTLE ${currentRound + 1} / ${totalRounds}`}
+                BATTLE {currentRound + 1} / {totalRounds}
             </span>
          </div>
          <h2 className="text-xl font-bold mb-1 text-yellow-300 drop-shadow-md text-center mt-2">{scenario.title}</h2>
@@ -196,7 +194,7 @@ export const BattleScreen: React.FC<BattleScreenProps> = ({
                      className="bg-transparent border-2 border-white hover:bg-white hover:text-slate-800 text-white font-bold py-2 px-6 rounded-lg flex items-center transition-all animate-pulse"
                   >
                      <span className="mr-2">▼</span>
-                     {currentRound < totalRounds - 1 || isAiMode ? (isAiMode ? '홈으로' : '다음 배틀로') : '결과 보기'}
+                     {currentRound < totalRounds - 1 ? '다음 배틀로' : '결과 보기'}
                   </button>
                </div>
             </div>

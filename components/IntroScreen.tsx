@@ -1,30 +1,14 @@
 import React, { useState } from 'react';
-import { Play, Info, Sparkles, X, Loader2, Trophy } from 'lucide-react';
+import { Play, Info, X, Trophy } from 'lucide-react';
 import { getPokemonImage, RESULTS } from '../constants';
-import { generateAiScenario } from '../services/geminiService';
-import { Scenario } from '../types';
 
 interface IntroScreenProps {
   onStart: () => void;
-  onAiStart: (scenario: Scenario) => void;
   highScore: number;
 }
 
-export const IntroScreen: React.FC<IntroScreenProps> = ({ onStart, onAiStart, highScore }) => {
+export const IntroScreen: React.FC<IntroScreenProps> = ({ onStart, highScore }) => {
   const [showLevelGuide, setShowLevelGuide] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  const handleAiGenerate = async () => {
-    setIsGenerating(true);
-    // Generate a random scenario
-    const scenario = await generateAiScenario("school life or friendship conflict");
-    setIsGenerating(false);
-    if (scenario) {
-      onAiStart(scenario);
-    } else {
-      alert("AI 생성에 실패했습니다. API 키를 확인해주세요.");
-    }
-  };
 
   return (
     <div className="min-h-screen bg-red-600 flex flex-col items-center justify-center p-4 font-sans relative overflow-hidden">
@@ -66,15 +50,6 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onStart, onAiStart, hi
             <Play className="mr-2 fill-current" /> 모험 시작하기
           </button>
           
-          <button 
-            onClick={handleAiGenerate}
-            disabled={isGenerating}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-[0_4px_0_rgb(107,33,168)] active:shadow-[0_0px_0_rgb(107,33,168)] active:translate-y-1 transition-all flex items-center justify-center disabled:opacity-70"
-          >
-            {isGenerating ? <Loader2 className="mr-2 animate-spin" /> : <Sparkles className="mr-2" />}
-            AI 스페셜 배틀
-          </button>
-
           <button 
             onClick={() => setShowLevelGuide(true)}
             className="w-full bg-white border-2 border-slate-300 hover:bg-slate-50 text-slate-600 font-bold py-3 px-8 rounded-lg text-lg flex items-center justify-center"

@@ -3,14 +3,12 @@ import { IntroScreen } from './components/IntroScreen';
 import { BattleScreen } from './components/BattleScreen';
 import { ResultScreen } from './components/ResultScreen';
 import { GAME_DATA } from './constants';
-import { GameState, Scenario } from './types';
+import { GameState } from './types';
 
 export default function App() {
   const [gameState, setGameState] = useState<GameState>('intro');
   const [currentRound, setCurrentRound] = useState(0);
   const [score, setScore] = useState(0);
-  const [activeScenario, setActiveScenario] = useState<Scenario>(GAME_DATA[0]);
-  const [isAiMode, setIsAiMode] = useState(false);
   
   // Initialize high score from local storage
   const [highScore, setHighScore] = useState<number>(() => {
@@ -26,18 +24,8 @@ export default function App() {
   // --- Handlers ---
   
   const startGame = () => {
-    setIsAiMode(false);
     setCurrentRound(0);
     setScore(0);
-    setActiveScenario(GAME_DATA[0]);
-    setGameState('battle');
-  };
-
-  const startAiGame = (scenario: Scenario) => {
-    setIsAiMode(true);
-    setCurrentRound(0);
-    setScore(0);
-    setActiveScenario(scenario);
     setGameState('battle');
   };
 
@@ -45,7 +33,6 @@ export default function App() {
     setGameState('intro');
     setCurrentRound(0);
     setScore(0);
-    setIsAiMode(false);
   };
 
   const handleOptionSelect = (roundScore: number) => {
@@ -53,16 +40,8 @@ export default function App() {
   };
 
   const nextRound = () => {
-    if (isAiMode) {
-      // AI mode is a single round for now
-      goHome();
-      return;
-    }
-
     if (currentRound < GAME_DATA.length - 1) {
-      const nextR = currentRound + 1;
-      setCurrentRound(nextR);
-      setActiveScenario(GAME_DATA[nextR]);
+      setCurrentRound(prev => prev + 1);
       setGameState('battle');
     } else {
       // Game Over: Check and update high score
@@ -81,7 +60,7 @@ export default function App() {
   // --- Render Logic ---
 
   if (gameState === 'intro') {
-    return <IntroScreen onStart={startGame} onAiStart={startAiGame} highScore={highScore} />;
+    return <IntroScreen onStart={startGame} highScore={highScore} />;
   }
 
   if (gameState === 'result') {
@@ -90,13 +69,12 @@ export default function App() {
 
   return (
     <BattleScreen 
-      scenario={activeScenario}
+      scenario={GAME_DATA[currentRound]}
       currentRound={currentRound}
-      totalRounds={isAiMode ? 1 : GAME_DATA.length}
+      totalRounds={GAME_DATA.length}
       onOptionSelect={handleOptionSelect}
       onNext={nextRound}
       onHome={goHome}
-      isAiMode={isAiMode}
     />
   );
 }
